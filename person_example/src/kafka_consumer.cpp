@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cppkafka/cppkafka.h>
-#include "../include/person.pb.h"
+#include "person.pb.h"
 
 using namespace std;
 using namespace cppkafka;

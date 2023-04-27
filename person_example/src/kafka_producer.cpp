@@ -1,11 +1,13 @@
 #include <iostream>
 #include <cppkafka/cppkafka.h>
-#include "../include/person.pb.h"
+#include "person.pb.h"
 
 using namespace std;
 using namespace cppkafka;
 
-int main() {
+int main()
+{
+  std::cout << "Start producer" << std::endl;
   // Initialize the Google Protocol Buffers library
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -24,8 +26,8 @@ int main() {
 
   // Set up the Kafka producer configuration
   Configuration config = {
-    {"metadata.broker.list", "localhost:9092"},
-    {"message.timeout.ms", 5000} // Increase the timeout to 5 seconds
+      {"metadata.broker.list", "localhost:9092"},
+      {"message.timeout.ms", 5000} // Increase the timeout to 5 seconds
   };
 
   // Create the Kafka producer
@@ -40,7 +42,8 @@ int main() {
   // producer.flush();
 
   // Wait for all messages to be acknowledged
-  while (producer.get_out_queue_length() > 0) {
+  while (producer.get_out_queue_length() > 0)
+  {
     this_thread::sleep_for(chrono::milliseconds(100));
   }
 

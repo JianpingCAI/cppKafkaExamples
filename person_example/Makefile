@@ -1,27 +1,43 @@
-
-# Compiler
 CXX = g++
+CXXFLAGS = -Wall -Wextra
 
-# Compiler flags
-CXXFLAGS = -std=c++11 -Wall -Wextra
+ifdef DEBUG
+CXXFLAGS += -g
+endif
 
-# Include path
-INCLUDE_PATH = -I./include
+LIBS = -lcppkafka -lrdkafka -lprotobuf
 
-# Linker flags
-LDFLAGS = -lcppkafka -lrdkafka -lprotobuf
+# Build directory
+BUILD_DIR = build/Debug
 
-# Executable names
-PRODUCER_EXEC = kafka_producer
-CONSUMER_EXEC = kafka_consumer
+# Object files
+KAFKA_PRODUCER_OBJ = $(BUILD_DIR)/kafka_producer.o
+KAFKA_CONSUMER_OBJ = $(BUILD_DIR)/kafka_consumer.o
+PERSON_OBJ = $(BUILD_DIR)/person.pb.o
 
-all: $(PRODUCER_EXEC) $(CONSUMER_EXEC)
+all: $(BUILD_DIR) kafka_producer kafka_consumer
 
-$(PRODUCER_EXEC): src/kafka_producer.cpp src/person.pb.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE_PATH) src/kafka_producer.cpp src/person.pb.cc -o $(PRODUCER_EXEC) $(LDFLAGS)
+kafka_producer: $(KAFKA_PRODUCER_OBJ) $(PERSON_OBJ)
+	$(CXX) $(CXXFLAGS) -o kafka_producer $(KAFKA_PRODUCER_OBJ) $(PERSON_OBJ) $(LIBS)
 
-$(CONSUMER_EXEC): src/kafka_consumer.cpp src/person.pb.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE_PATH) src/kafka_consumer.cpp src/person.pb.cc -o $(CONSUMER_EXEC) $(LDFLAGS)
+kafka_consumer: $(KAFKA_CONSUMER_OBJ) $(PERSON_OBJ)
+	$(CXX) $(CXXFLAGS) -o kafka_consumer $(KAFKA_CONSUMER_OBJ) $(PERSON_OBJ) $(LIBS)
+
+$(KAFKA_PRODUCER_OBJ): src/kafka_producer.cpp src/person.pb.h
+	$(CXX) $(CXXFLAGS) -c src/kafka_producer.cpp -o $@
+
+$(KAFKA_CONSUMER_OBJ): src/kafka_consumer.cpp src/person.pb.h
+	$(CXX) $(CXXFLAGS) -c src/kafka_consumer.cpp -o $@
+
+$(PERSON_OBJ): src/person.pb.cc src/person.pb.h
+	$(CXX) $(CXXFLAGS) -c src/person.pb.cc -o $@
+
+src/person.pb.h src/person.pb.cc: protos/person.proto
+	protoc -I=protos --cpp_out=src protos/person.proto
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -f $(PRODUCER_EXEC) $(CONSUMER_EXEC)
+	rm -rf $(BUILD_DIR)
+	rm -f kafka_producer kafka_consumer src/person.pb.h src/person.pb.cc
