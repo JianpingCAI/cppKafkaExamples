@@ -31,7 +31,8 @@ int main() {
       } else {
         // Deserialize the message payload into a Person object
         Person person;
-        person.ParseFromString(msg.get_payload());
+        // person.ParseFromString(msg.get_payload());
+        person.ParseFromArray(msg.get_payload().get_data(), msg.get_payload().get_size());
 
         // Display the received Person object
         cout << "Received person: name = " << person.name() << ", age = " << person.age() << endl;
