@@ -13,14 +13,15 @@ BUILD_DIR = build/Debug
 # Object files
 KAFKA_PRODUCER_OBJ = $(BUILD_DIR)/kafka_producer.o
 KAFKA_CONSUMER_OBJ = $(BUILD_DIR)/kafka_consumer.o
+
 PERSON_OBJ = $(BUILD_DIR)/person.pb.o
 
 all: $(BUILD_DIR) kafka_producer kafka_consumer
 
-kafka_producer: $(KAFKA_PRODUCER_OBJ) $(PERSON_OBJ)
+kafka_producer: $(BUILD_DIR) $(KAFKA_PRODUCER_OBJ) $(PERSON_OBJ) 
 	$(CXX) $(CXXFLAGS) -o kafka_producer $(KAFKA_PRODUCER_OBJ) $(PERSON_OBJ) $(LIBS)
 
-kafka_consumer: $(KAFKA_CONSUMER_OBJ) $(PERSON_OBJ)
+kafka_consumer: $(BUILD_DIR) $(KAFKA_CONSUMER_OBJ) $(PERSON_OBJ)
 	$(CXX) $(CXXFLAGS) -o kafka_consumer $(KAFKA_CONSUMER_OBJ) $(PERSON_OBJ) $(LIBS)
 
 $(KAFKA_PRODUCER_OBJ): src/kafka_producer.cpp src/person.pb.h

@@ -1,0 +1,41 @@
+# Makefile
+
+CXX=g++
+CXXFLAGS=-std=c++11 -Wall -Iinclude -I$(PROTO_OBJDIR)
+LIBS=-lrdkafka++ -lrdkafka -lcppkafka
+
+SRCDIR=src
+OBJDIR=obj
+SOURCES=$(wildcard $(SRCDIR)/*.cpp)
+OBJECTS=$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
+
+# Proto files
+PROTO_SRCDIR=protos
+PROTO_OBJDIR=obj/protos
+PROTO_SOURCES=$(wildcard $(PROTO_SRCDIR)/*.proto)
+PROTO_OBJECTS=$(patsubst $(PROTO_SRCDIR)/%.proto,$(PROTO_OBJDIR)/%.pb.cc,$(PROTO_SOURCES))
+
+TARGETS=kafka_producer kafka_consumer
+
+all: $(OBJDIR) $(PROTO_OBJDIR) $(TARGETS)
+
+$(OBJDIR):
+	mkdir $(OBJDIR)
+
+$(PROTO_OBJDIR):
+	mkdir -p $(PROTO_OBJDIR)
+
+$(PROTO_OBJDIR)/%.pb.cc: $(PROTO_SRCDIR)/%.proto
+	protoc -I=$(PROTO_SRCDIR) --cpp_out=$(PROTO_OBJDIR) $<
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(PROTO_OBJECTS)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+kafka_producer: $(OBJDIR)/kafka_producer.o $(OBJDIR)/RoundRobinPartitioner.o $(OBJDIR)/MyEventCb.o $(PROTO_OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS) -lprotobuf
+
+kafka_consumer: $(OBJDIR)/kafka_consumer.o $(OBJDIR)/MyEventCb.o $(PROTO_OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS) -lprotobuf
+
+clean:
+	rm -rf $(TARGETS) $(OBJDIR)

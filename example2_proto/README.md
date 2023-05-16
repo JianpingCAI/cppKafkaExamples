@@ -7,12 +7,10 @@ This project demonstrates a simple Apache Kafka producer and consumer in C++ usi
 ```
 kafka\_example/
 │
-├── include/
-│   └── person.pb.h
-│
 ├── src/
 │   ├── kafka\_consumer.cpp
 │   ├── kafka\_producer.cpp
+│   ├── person.pb.h
 │   └── person.pb.cc
 │
 ├── protos/
@@ -49,7 +47,25 @@ kafka\_example/
 
 ## Usage
 
-1. Start the Kafka and Zookeeper servers following the instructions in the [official Kafka documentation](https://kafka.apache.org/quickstart).
+1. Start the Kafka and Zookeeper
+
+  **Start the ZooKeeper server**: Kafka uses ZooKeeper to manage its distributed nature, so you need to start the ZooKeeper server before starting Kafka. Run the following command:
+
+   ```bash
+   bin/zookeeper-server-start.sh config/zookeeper.properties
+   ```
+
+   Keep this terminal open or run the command in the background.
+
+   **Start the Kafka server**: Open a new terminal and navigate to the Kafka directory, then run the following command:
+
+   ```bash
+   bin/kafka-server-start.sh config/server.properties
+   ```
+
+   Keep this terminal open or run the command in the background.
+
+   Once the Kafka server is up and running, you should be able to run the Kafka producer and consumer built in the next step.
 
 2. Run the Kafka producer in a separate terminal.
 
