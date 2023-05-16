@@ -1,0 +1,23 @@
+@startuml
+
+actor "Kafka Producer" as producer
+actor "Kafka Consumer" as consumer
+actor "ZooKeeper" as zookeeper
+
+database "Kafka Broker 1" as broker1
+database "Kafka Broker 2" as broker2
+database "Kafka Broker N" as brokerN
+
+zookeeper --> broker1 : Coordination, Configuration
+zookeeper --> broker2 : Coordination, Configuration
+zookeeper --> brokerN : Coordination, Configuration
+
+producer --> broker1 : Send messages
+producer --> broker2 : Send messages
+producer --> brokerN : Send messages
+
+consumer --> broker1 : Consume messages
+consumer --> broker2 : Consume messages
+consumer --> brokerN : Consume messages
+
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+
+package "Kafka Producer" {
+  [Producer Application]
+}
+
+package "Kafka Consumer" {
+  [Consumer Application]
+}
+
+cloud "ZooKeeper Cluster" {
+  [ZooKeeper]
+}
+
+cloud "Kafka Cluster" {
+  [Kafka Broker 1]
+  [Kafka Broker 2]
+  [Kafka Broker N]
+}
+
+[Producer Application] --> [Kafka Broker 1] : Send messages
+[Producer Application] --> [Kafka Broker 2] : Send messages
+[Producer Application] --> [Kafka Broker N] : Send messages
+
+[Consumer Application] --> [Kafka Broker 1] : Consume messages
+[Consumer Application] --> [Kafka Broker 2] : Consume messages
+[Consumer Application] --> [Kafka Broker N] : Consume messages
+
+[ZooKeeper] --> [Kafka Broker 1] : Coordination, Configuration
+[ZooKeeper] --> [Kafka Broker 2] : Coordination, Configuration
+[ZooKeeper] --> [Kafka Broker N] : Coordination, Configuration
+
+@enduml
