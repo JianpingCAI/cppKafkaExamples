@@ -10,7 +10,7 @@ int main()
     std::string topic_str = "test";
     std::string message = "Hello, World!";
 
-    RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
+    std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
 
     if (conf->set("bootstrap.servers", brokers, errstr) != RdKafka::Conf::CONF_OK)
     {
@@ -18,14 +18,14 @@ int main()
         exit(1);
     }
 
-    RdKafka::Producer *producer = RdKafka::Producer::create(conf, errstr);
+    std::unique_ptr<RdKafka::Producer> producer(RdKafka::Producer::create(conf.get(), errstr));
     if (!producer)
     {
         std::cerr << "Failed to create producer: " << errstr << std::endl;
         exit(1);
     }
 
-    std::unique_ptr<RdKafka::Topic> topic(RdKafka::Topic::create(producer, topic_str, nullptr, errstr));
+    std::unique_ptr<RdKafka::Topic> topic(RdKafka::Topic::create(producer.get(), topic_str, nullptr, errstr));
 
     RdKafka::ErrorCode resp = producer->produce(
         topic.get(),
@@ -35,14 +35,6 @@ int main()
         message.size(),
         nullptr,
         nullptr);
-    // RdKafka::ErrorCode resp = producer->produce(
-    //     topic1.get(),
-    //     RdKafka::Topic::PARTITION_UA,
-    //     RdKafka::Producer::RK_MSG_COPY,
-    //     const_cast<char *>(payload.data()),
-    //     payload.size(),
-    //     nullptr,
-    //     nullptr);
 
     if (resp != RdKafka::ERR_NO_ERROR)
     {
@@ -59,8 +51,6 @@ int main()
     {
         producer->poll(1000);
     }
-
-    delete producer;
 
     return 0;
 }

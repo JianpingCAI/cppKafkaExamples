@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <memory>
 #include <librdkafka/rdkafkacpp.h>
 
 class ExampleEventCb : public RdKafka::EventCb
@@ -42,7 +43,7 @@ int main()
     std::string topic_str = "test";
     std::string group_id = "my_group";
 
-    RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
+    std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
     // RdKafka::Conf *tconf = RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC);
 
     if (conf->set("bootstrap.servers", brokers, errstr) != RdKafka::Conf::CONF_OK)
@@ -64,7 +65,7 @@ int main()
         exit(1);
     }
 
-    RdKafka::KafkaConsumer *consumer = RdKafka::KafkaConsumer::create(conf, errstr);
+    std::unique_ptr<RdKafka::KafkaConsumer> consumer(RdKafka::KafkaConsumer::create(conf.get(), errstr));
     if (!consumer)
     {
         std::cerr << "Failed to create consumer: " << errstr << std::endl;
@@ -113,7 +114,5 @@ int main()
     }
 
     consumer->close();
-    delete consumer;
-
     return 0;
 }
