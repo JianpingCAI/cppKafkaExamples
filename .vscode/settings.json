@@ -97,6 +97,13 @@
     "cinttypes": "cpp",
     "typeindex": "cpp",
     "typeinfo": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "any": "cpp",
+    "hash_map": "cpp",
+    "hash_set": "cpp",
+    "codecvt": "cpp",
+    "forward_list": "cpp",
+    "iomanip": "cpp",
+    "valarray": "cpp"
   }
 }

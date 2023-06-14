@@ -45,6 +45,8 @@ int main()
             std::cout << "Received message: " << static_cast<char *>(msg->payload()) << std::endl;
             break;
         case RdKafka::ERR__TIMED_OUT:
+            std::cout << "Time out! No message received in 1000ms" << std::endl;
+
             // Handle timeouts
             break;
         default:

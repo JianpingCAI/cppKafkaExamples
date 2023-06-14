@@ -46,35 +46,12 @@ echo "export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac))
 source ~/.bashrc
 ```
 
-## **Step 1: Install librdkafka and cppkafka**
-
-Install librdkafka:
-
-```bash
-git clone https://github.com/edenhill/librdkafka.git
-cd librdkafka
-./configure --prefix=/usr
-make
-sudo make install
-```
-
-Install cppkafka:
-
-```bash
-git clone https://github.com/mfontanini/cppkafka.git
-cd cppkafka
-mkdir build
-cd build
-cmake .. -DRDKAFKA_ROOT_DIR=/usr
-make
-sudo make install
-```
-
-## **Step 2: Install the Kafka broker**
+## **Step 1: Install and Run Kafka ZooKeeper and Broker**
 
 1. **Download and install Kafka**: Download the latest Kafka release from the official website (<https://kafka.apache.org/downloads>) and extract the archive:
 
 ```bash
+wget https://downloads.apache.org/kafka/3.4.0/kafka_2.13-3.4.0.tgz
 tar -xzf kafka_2.XX-YY.ZZ.tgz
 cd kafka_2.XX-YY.ZZ
 ```
@@ -98,6 +75,30 @@ bin/kafka-server-start.sh config/server.properties
 Keep this terminal open or run the command in the background.
 
 Once the Kafka server is up and running, you should be able to run the Kafka producer and consumer built in the next step.
+
+## **Step 2: Install C++ Dependencies: librdkafka and cppkafka**
+
+Install librdkafka:
+
+```bash
+git clone https://github.com/edenhill/librdkafka.git
+cd librdkafka
+./configure --prefix=/usr
+make
+sudo make install
+```
+
+Install cppkafka:
+
+```bash
+git clone https://github.com/mfontanini/cppkafka.git
+cd cppkafka
+mkdir build
+cd build
+cmake .. -DRDKAFKA_ROOT_DIR=/usr
+make
+sudo make install
+```
 
 ## **Step 3: Create a Kafka producer**
 
