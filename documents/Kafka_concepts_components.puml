@@ -1,0 +1,45 @@
+@startuml
+
+skinparam component {
+  BackgroundColor<<producer>> Yellow
+  BackgroundColor<<consumer>> SkyBlue
+  BackgroundColor<<kafka>> LightGreen
+}
+
+package "Kafka Cluster" <<kafka>> {
+  [Topic1] as topic1 <<kafka>>
+  [Partition1] as partition1 <<kafka>>
+  [Partition2] as partition2 <<kafka>>
+  [Offset1] as offset1 <<kafka>>
+  [Offset2] as offset2 <<kafka>>
+}
+
+cloud {
+  [Producer1] as producer1 <<producer>>
+  [Producer2] as producer2 <<producer>>
+}
+
+cloud {
+  [Consumer Group1] as consumerGroup1 <<consumer>>
+  [Consumer1] as consumer1 <<consumer>>
+  [Consumer2] as consumer2 <<consumer>>
+}
+
+topic1 --> partition1 : contains
+topic1 --> partition2 : contains
+partition1 --> offset1 : contains
+partition2 --> offset2 : contains
+
+producer1 --> topic1 : produces messages to
+producer2 --> topic1 : produces messages to
+
+consumer1 --> partition1 : consumes messages from
+consumer2 --> partition2 : consumes messages from
+
+consumerGroup1 --> consumer1 : contains
+consumerGroup1 --> consumer2 : contains
+
+consumer1 --> offset1 : reads until
+consumer2 --> offset2 : reads until
+
+@enduml
