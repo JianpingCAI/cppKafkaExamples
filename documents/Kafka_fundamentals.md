@@ -171,7 +171,56 @@ Each message has a:
   
 ### **Message Retention Policy**
 
-TODO
+Apache Kafka is designed to provide durable, long-term storage for events or records. The retention policy in Kafka determines how long the messages or records stay within the system before they get discarded. There are two primary types of retention policies:
+
+1. **Time-based retention**: This policy keeps the records for a specified amount of time. Any record that exceeds this limit is discarded from the system. The time duration can be set according to your requirements. The parameter for setting time-based retention is `log.retention.hours`, `log.retention.minutes`, or `log.retention.ms`. You can choose to set any of these three parameters.
+
+2. **Size-based retention**: In size-based retention, Kafka will keep the records until the total size of the logs reaches a certain size limit. After this limit, the old logs start to get discarded. The parameter for setting size-based retention is `log.retention.bytes`.
+
+In addition to these, Kafka also uses a concept of "cleaner". The log cleaner is a policy to manage how much log segments are retained based on compaction. This is different from time or size retention and is based on record keys.
+
+The important thing to note here is that Kafka guarantees at least the specified retention period for the records. However, due to segment sizing (Kafka rolls new segments under certain conditions), the records might be kept longer than the specified retention period.
+
+**Example**
+
+The retention policy can be set at the broker level or the topic level. Here is how you might specify a time-based retention policy for a new topic:
+
+```bash
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic MyTopic --config retention.ms=86400000
+```
+
+In this command, the `--config retention.ms=86400000` option sets the retention period to 86400000 milliseconds, or 24 hours.
+
+Similarly, here is how you might specify a size-based retention policy:
+
+```bash
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic MyTopic --config retention.bytes=1073741824
+```
+
+In this command, the `--config retention.bytes=1073741824` option sets the maximum size of the log before old messages are discarded to 1073741824 bytes, or 1 GB.
+
+You can also modify the retention policy of an existing topic with the `--alter` command:
+
+```bash
+bin/kafka-topics.sh --alter --bootstrap-server localhost:9092 --topic MyTopic --config retention.ms=172800000
+```
+
+In this command, we change the retention period of `MyTopic` to 172800000 milliseconds, or 48 hours.
+
+### Default Retention Policy
+
+In Apache Kafka, the default retention policy is time-based, with messages being retained for seven days (168 hours).
+
+This is controlled by the configuration parameter `log.retention.hours`, `log.retention.minutes`, or `log.retention.ms`. By default, `log.retention.hours` is set to 168, which is equal to seven days.
+
+It's important to note that these are **broker-level** configurations, which means they apply to all topics on the Kafka broker unless overridden at the topic level.
+
+Here is the exact configuration in the Kafka's `server.properties` file:
+
+```
+# The minimum age of a log file to be eligible for deletion due to age
+log.retention.hours=168
+```
 
 ### **Replica in Kafka**
 
