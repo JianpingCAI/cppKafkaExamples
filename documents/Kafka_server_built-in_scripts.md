@@ -66,60 +66,65 @@ Apache Kafka comes with a number of shell scripts that are useful for managing a
      zookeeper-shell.sh localhost:2181 ls /
      ```
 
-1. **kafka-run-class.sh**: This script is used to run a class in the Kafka codebase. It's more of a utility script used by other scripts, but can be used directly to run Kafka classes.
+1.**kafka-run-class.sh**: This script is used to run a class in the Kafka codebase. It's more of a utility script used by other scripts, but can be used directly to run Kafka classes.
 
-2. **kafka-server-start.sh and kafka-server-stop.sh**: These scripts are used to start and stop a Kafka broker.
+2.**kafka-server-start.sh** and **kafka-server-stop.sh**: These scripts are used to start and stop a Kafka broker.
 
    Example usage:
-   - Start a Kafka broker:
+
+- Start a Kafka broker:
 
      ```
      kafka-server-start.sh config/server.properties
      ```
 
-   - Stop a Kafka broker:
+- Stop a Kafka broker:
 
      ```
      kafka-server-stop.sh
      ```
 
-3. **zookeeper-server-start.sh and zookeeper-server-stop.sh**: These scripts are used to start and stop a ZooKeeper server. ZooKeeper is a service that Kafka uses for maintaining configuration information and providing distributed synchronization.
+3.**zookeeper-server-start.sh** and **zookeeper-server-stop.sh**: These scripts are used to start and stop a ZooKeeper server. ZooKeeper is a service that Kafka uses for maintaining configuration information and providing distributed synchronization.
 
    Example usage:
-   - Start a ZooKeeper server:
+
+- Start a ZooKeeper server:
 
      ```
      zookeeper-server-start.sh config/zookeeper.properties
      ```
 
-   - Stop a ZooKeeper server:
+- Stop a ZooKeeper server:
 
      ```
      zookeeper-server-stop.sh
      ```
 
-4. **kafka-producer-perf-test.sh**: This script is used to load test the Kafka cluster. It produces a specified number of messages of a specified size to a specified topic.
+4.**kafka-producer-perf-test.sh**: This script is used to load test the Kafka cluster. It produces a specified number of messages of a specified size to a specified topic.
 
    Example usage:
-   - Produce 10000 messages of size 100 to the "test" topic:
+
+- Produce 10000 messages of size 100 to the "test" topic:
 
      ```
      kafka-producer-perf-test.sh --topic test --num-records 10000 --record-size 100 --throughput -1 --producer-props bootstrap.servers=localhost:9092
      ```
 
-5. **kafka-replica-verification.sh**: This script is used to test the consistency of replicas in a Kafka cluster. It compares the set of messages in two replicas to ensure they are the same.
+5.**kafka-replica-verification.sh**: This script is used to test the consistency of replicas in a Kafka cluster. It compares the set of messages in two replicas to ensure they are the same.
 
    Example usage:
-   - Verify the consistency of replicas for the "test" topic:
+
+- Verify the consistency of replicas for the "test" topic:
 
      ```
      kafka-replica-verification.sh --broker-list localhost:9092 --topic-white-list test
      ```
 
-6. **kafka-delegation-tokens.sh**: This script is used to manage delegation tokens in a Kafka cluster. Delegation tokens are used for authentication in a Kafka cluster.
+6.**kafka-delegation-tokens.sh**: This script is used to manage delegation tokens in a Kafka cluster. Delegation tokens are used for authentication in a Kafka cluster.
 
    Example usage:
-   - Create a delegation token:
+
+- Create a delegation token:
 
      ```
      kafka-delegation-tokens.sh --bootstrap-server localhost:9092 --create --max-life-time-period -1

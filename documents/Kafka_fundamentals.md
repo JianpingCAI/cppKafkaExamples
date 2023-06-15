@@ -170,3 +170,78 @@ Each message has a:
   - only-once
   
 ### **Message Retention Policy**
+
+TODO
+
+### **Replica in Kafka**
+
+In Apache Kafka, a replica refers to the replication of a Kafka topic's partition. Replicas are an essential concept that ensures fault-tolerance in Kafka. There are two types of replicas:
+
+1. **Leader Replica**: For each partition, one of the brokers is chosen as the leader. This broker is responsible for all reads and writes for the given partition. When any producer sends a message pertaining to a particular topic, this message is sent to the partition's leader broker.
+
+2. **Follower Replica**: Other brokers that replicate the leader's log are known as follower replicas. They are passive and just copy the leader's data. Their main purpose is to serve as a replacement in case the leader broker goes down.
+
+Each topic has a replication factor that indicates how many copies of a topic's partition should exist. If a replication factor is three, Kafka will create three identical copies of each partition. Partitions can have multiple replicas for fault-tolerance, which are stored on separate Kafka brokers. Each partition has one leader replica and zero or more follower replicas. The leader replica handles all read and write requests for the partition, while the follower replicas passively replicate the leader. If the leader fails, one of the followers will automatically be promoted to be the new leader.
+
+Here is a visual representation to illustrate this:
+
+```
+Topic: TestTopic
+|               Broker 1              |               Broker 2              |               Broker 3              |
+|-------------------------------------|-------------------------------------|-------------------------------------|
+| Partition 1 (leader)               | Partition 2 (follower)              | Partition 1 (follower)              |
+| Partition 2 (follower)             | Partition 1 (follower)              | Partition 2 (leader)                |
+```
+
+In this example, `TestTopic` is split into two partitions. Each partition has one leader and two followers, distributed across three brokers.
+
+A few key points:
+
+- Each message written to a partition gets a sequential id number called the offset.
+- Kafka guarantees that records in a partition will be kept in the order they were written.
+- The offset for a record being added to a partition is always increasing.
+- The followers consume records from the leader just like a normal Kafka consumer. When the followers are up to date with the leader, they are said to be in-sync.
+- In case of a leader replica's failure, one of the in-sync replicas will be chosen as the new leader.
+
+This design allows Kafka to be both highly scalable and fault-tolerant. You can increase throughput by increasing the number of partitions in a topic, and increase fault tolerance by increasing the number of replicas for each partition. The Kafka cluster balances replicas across all the brokers to spread the load.
+
+Replication provides two primary benefits:
+
+- It ensures **Durability**: Since data is copied to other brokers, data loss can be prevented in the event of a broker's failure.
+- It ensures **High Availability**: If a leader broker goes down, one of the follower replicas can be ***elected*** as the new leader to continue serving client requests.
+
+**Code Example**
+
+The Kafka **replication factor** is typically set at topic creation time. This can be done using the `kafka-topics` CLI command:
+
+```bash
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 3 --partitions 1 --topic MyTopic
+```
+
+Here we create a topic named `MyTopic` with a replication factor of 3 and 1 partition. The `--bootstrap-server` option specifies the address of the Kafka server.
+
+In C++, the replication factor is abstracted away. You don't specify the replication factor in your code. Your code just interacts with topics. Underneath, Kafka will ensure that data is replicated according to the replication factor set at topic creation time.
+
+For example, a producer in C++ would produce messages like this, not aware of the underlying replicas:
+
+```cpp
+std::string brokers = "localhost:9092";
+std::string errstr;
+std::string topic_str = "MyTopic";
+
+RdKafka::Conf *conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
+conf->set("bootstrap.servers", brokers, errstr);
+
+RdKafka::Producer *producer = RdKafka::Producer::create(conf, errstr);
+
+RdKafka::Topic *topic = RdKafka::Topic::create(producer, topic_str,
+                                               topic_conf, errstr);
+
+std::string message = "message content";
+producer->produce(topic, RdKafka::Topic::PARTITION_UA,
+                  RdKafka::Producer::RK_MSG_COPY, 
+                  const_cast<char *>(message.c_str()), message.size(),
+                  NULL, NULL);
+```
+
+Note: The Kafka client in C++ does not handle the replication directly. It's managed by the Kafka cluster according to the configuration defined when creating the topic. Your client applications (producers and consumers) just read/write from/to a Kafka topic. Underneath, Kafka will take care of replicating the data across different brokers.
