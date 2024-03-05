@@ -4,7 +4,8 @@
             "name": "linux-gcc-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/performance_example/src"
+                "${workspaceFolder}/performance_example/src",
+                "/usr/local"
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "${default}",
